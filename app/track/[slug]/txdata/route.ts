@@ -40,6 +40,7 @@ export async function POST(
     method: "eth_sendTransaction",
     params: {
       ...mintData.mintTransaction,
+      // TODO: add attribution?
     },
   });
 }

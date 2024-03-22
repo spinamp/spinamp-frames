@@ -46,6 +46,10 @@ const reducer: FrameReducer<State> = (state, action) => {
     console.log(
       " i got an update from the listen page. that must mean the user minted"
     );
+
+    // TODO: update the current page to TX_SENT
+    // show transaction hash
+    // show like & follow buttons?
   }
 
   return {
