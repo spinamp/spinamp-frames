@@ -10,12 +10,13 @@ import {
   useFramesReducer,
 } from "frames.js/next/server";
 import Link from "next/link";
-import { currentURL, sendPinataAnalytics } from "../../utils";
+import { currentURL, sendNotification, sendPinataAnalytics } from "../../utils";
 import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
 
 enum Page {
   HOME,
   LISTEN,
+  MINTED,
 }
 
 type State = {
@@ -57,6 +58,7 @@ const reducer: FrameReducer<State> = (state, action) => {
     console.log(
       " i got an update from the listen page. that must mean the user minted"
     );
+    page = Page.MINTED;
 
     // TODO: update the current page to TX_SENT
     // show transaction hash
@@ -127,7 +129,54 @@ export default async function Track({
 
   if (state.currentPage === Page.LISTEN) {
     // send notification
+    await sendNotification({
+      spindexerUserId: "0x181BbB3acd071443F0e4c7d1F01fC821e3CC508a",
+      artistName: track!.artist.name,
+      trackId: track!.id,
+      trackTitle: track!.title,
+      trackUrl: `https://app.spinamp.xyz/track/${(params as any).slug}`,
+    });
 
+    // then, when done, return next frame
+    return (
+      <div>
+        Mint button example <Link href={createDebugUrl(url)}>Debug</Link>
+        <FrameContainer
+          pathname={`/track/${slug}`}
+          postUrl="/track/loaded/frames"
+          state={state}
+          previousFrame={previousFrame}
+        >
+          <FrameImage aspectRatio="1.91:1">
+            <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
+              <div tw="flex flex-row">long press notification to listen</div>
+              <img
+                width={200}
+                src={getResizedArtworkUrl(track!.lossyArtworkUrl!, 200)}
+                alt="frame image"
+              />
+              <div tw="flex flex-row">{track?.title}</div>
+              <div tw="flex flex-row">{track?.artist.name}</div>
+            </div>
+          </FrameImage>
+          <FrameButton
+            action="tx"
+            target={`/track/${slug}/txdata?trackId=${track!.id}`}
+          >
+            collect
+          </FrameButton>
+          <FrameButton
+            action="link"
+            target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
+          >
+            open
+          </FrameButton>
+        </FrameContainer>
+      </div>
+    );
+  }
+
+  if (state.currentPage === Page.MINTED) {
     // then, when done, return next frame
     return (
       <div>
