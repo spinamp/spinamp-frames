@@ -42,6 +42,12 @@ const reducer: FrameReducer<State> = (state, action) => {
     }
   }
 
+  if (state.currentPage === Page.LISTEN) {
+    console.log(
+      " i got an update from the listen page. that must mean the user minted"
+    );
+  }
+
   return {
     currentPage: page,
   };
@@ -77,8 +83,8 @@ export default async function Track({
             <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
               <div tw="flex flex-row">
                 <img
-                  width={300}
-                  src={getResizedArtworkUrl(track?.lossyArtworkUrl, 300)}
+                  width={200}
+                  src={getResizedArtworkUrl(track?.lossyArtworkUrl, 200)}
                 />
               </div>
               <div tw="flex flex-row">{track?.title}</div>
@@ -114,14 +120,19 @@ export default async function Track({
             <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
               <div tw="flex flex-row">long press notification to listen</div>
               <img
-                width={300}
-                src={getResizedArtworkUrl(track?.lossyArtworkUrl, 300)}
+                width={200}
+                src={getResizedArtworkUrl(track?.lossyArtworkUrl, 200)}
               />
               <div tw="flex flex-row">{track?.title}</div>
               <div tw="flex flex-row">{track?.artist.name}</div>
             </div>
           </FrameImage>
-          <FrameButton>collect</FrameButton>
+          <FrameButton
+            action="tx"
+            target={`/track/${slug}/txdata?trackId=${track.id}`}
+          >
+            collect
+          </FrameButton>
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${params.slug}`}
