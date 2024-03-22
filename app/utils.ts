@@ -1,3 +1,4 @@
+import { Wallet } from "ethers";
 import { headers } from "next/headers";
 
 export function currentURL(pathname: string): URL {
@@ -54,16 +55,28 @@ export async function sendNotification(payload: {
   trackTitle: string;
   artistName: string;
 }) {
+  const body = {
+    msg: JSON.stringify(payload),
+    signature: await signMessage(JSON.stringify(payload)),
+  };
+
   const options = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   };
 
   return fetch(process.env.SPINAMP_NOTIFICATIONS_ENDPOINT!, options)
     .then((response) => response.json())
     .then((response) => console.log(response))
     .catch((err) => console.error(err));
+}
+
+async function signMessage(message: string) {
+  const pk = process.env.SIGNER_PRIVATE_KEY!;
+  const wallet = new Wallet(pk);
+
+  return wallet.signMessage(message);
 }
