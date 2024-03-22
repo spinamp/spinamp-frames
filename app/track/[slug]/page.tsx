@@ -75,10 +75,14 @@ export default async function Track({
         >
           <FrameImage aspectRatio="1.91:1">
             <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
-              <div tw="flex flex-row"></div>
+              <div tw="flex flex-row">
+                <img
+                  width={300}
+                  src={getResizedArtworkUrl(track?.lossyArtworkUrl, 300)}
+                />
+              </div>
               <div tw="flex flex-row">{track?.title}</div>
               <div tw="flex flex-row">{track?.artist.name}</div>
-              <div tw="flex flex-row">{state.currentPage}</div>
             </div>
           </FrameImage>
           <FrameButton>Listen</FrameButton>
@@ -108,10 +112,13 @@ export default async function Track({
         >
           <FrameImage aspectRatio="1.91:1">
             <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
-              <div tw="flex flex-row">download spinamp to listen</div>
+              <div tw="flex flex-row">long press notification to listen</div>
+              <img
+                width={300}
+                src={getResizedArtworkUrl(track?.lossyArtworkUrl, 300)}
+              />
               <div tw="flex flex-row">{track?.title}</div>
               <div tw="flex flex-row">{track?.artist.name}</div>
-              <div tw="flex flex-row">{state.currentPage}</div>
             </div>
           </FrameImage>
           <FrameButton>collect</FrameButton>
