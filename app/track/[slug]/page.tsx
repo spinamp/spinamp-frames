@@ -21,7 +21,7 @@ import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
 import { getAddress } from "ethers/lib/utils";
 
 import {
-  makeCollectedFrameImageURL,
+  makeListenFrameImageURL,
   makeTrackFrameImageURL,
 } from "../../helpers/image-gen";
 
@@ -217,6 +217,11 @@ export default async function Track({
       );
     }
 
+    const listenImageUrl = makeListenFrameImageURL(
+      track!.lossyArtworkIPFSHash!,
+      safeTitle,
+      safeArtistName
+    );
     // then, when done, return next frame
     return (
       <div>
@@ -227,7 +232,7 @@ export default async function Track({
           state={state}
           previousFrame={previousFrame}
         >
-          <FrameImage src={artworkURL} aspectRatio="1:1" />
+          <FrameImage src={listenImageUrl} aspectRatio="1:1" />
           <FrameButton
             action="tx"
             target={`/track/${slug}/txdata?trackId=${track!.id}`}

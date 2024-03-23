@@ -6,6 +6,28 @@ export const makeTrackFrameImageURL = (
   return `https://content.spinamp.xyz/spinamp-prod/image/upload/c_fill,h_450,w_600/l_icj2i9l7buaqgysbkjov/c_scale,h_150,w_600/fl_layer_apply,y_300/l_mswxugaoxwes9etdnelw/c_scale,h_100,w_100/fl_layer_apply,x_-200,y_225/l_nsbiafuxqisj4li5b9vp/c_scale,h_40,w_20/fl_layer_apply,x_-200,y_280/co_rgb:FFFFFF,l_text:helvetica_26_bold_normal_left:${trackTitle}/fl_layer_apply,g_west,x_170,y_200/co_rgb:FFFFFF,l_text:helvetica_20_normal_left:${artistName}/fl_layer_apply,g_west,x_170,y_240/ipfs_image/${trackImageIPFSHash}`;
 };
 
+export const makeListenFrameImageURL = (
+  trackImageIPFSHash: string,
+  trackTitle: string,
+  artistName: string
+) => {
+  const topText = "Song delivered to your phone ⬆";
+  const nowPlaying = "now playing:";
+
+  return (
+    `https://content.spinamp.xyz/spinamp-prod/image/upload/c_fill,h_450,w_600` +
+    `/l_icj2i9l7buaqgysbkjov/c_scale,h_150,w_600/fl_layer_apply,y_300` + // bottom bar background
+    // `/l_mswxugaoxwes9etdnelw/c_scale,h_100,w_100/fl_layer_apply,x_-200,y_225` + // play button
+    // `/l_nsbiafuxqisj4li5b9vp/c_scale,h_40,w_20/fl_layer_apply,x_-100,y_280` + // arrow
+    `/l_icj2i9l7buaqgysbkjov/c_scale,h_50,w_600/fl_layer_apply,y_-300` + // top bar background
+    `/co_rgb:FFFFFF,l_text:helvetica_20_normal_left:${topText}/fl_layer_apply,g_west,x_150,y_-280` + // top text
+    `/co_rgb:7d7d7d,l_text:helvetica_18_normal_left:${nowPlaying}/fl_layer_apply,g_west,x_70,y_200` + // track name
+    `/co_rgb:FFFFFF,l_text:helvetica_26_bold_normal_left:${trackTitle}/fl_layer_apply,g_west,x_70,y_230` + // track name
+    `/co_rgb:FFFFFF,l_text:helvetica_20_normal_left:${artistName}/fl_layer_apply,g_west,x_70,y_265` + // artist name
+    `/ipfs_image/${trackImageIPFSHash}` // track image
+  );
+};
+
 // currently doesn't meet the design and is not in use
 export const makeCollectedFrameImageURL = (
   trackTitle: string,
