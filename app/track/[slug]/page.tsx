@@ -134,17 +134,6 @@ export default async function Track({
     safeArtistName
   );
 
-  const CollectButton = () => {
-    return (
-      <FrameButton
-        action="tx"
-        target={`/track/${slug}/txdata?trackId=${track!.id}`}
-      >
-        Collect
-      </FrameButton>
-    );
-  };
-
   if (state.currentPage === Page.HOME) {
     // then, when done, return next frame
     return (
@@ -195,7 +184,7 @@ export default async function Track({
           previousFrame={previousFrame}
         >
           <FrameImage
-            src="https://content.spinamp.xyz/image/upload/v1711182176/o3hrzk3iypsjfdoknxk0.gif"
+            src="https://spinamp.mypinata.cloud/ipfs/Qmf9qgVShudRcyDLY8esEH9iUS6yX7wms5NcpkeRyoyzCW"
             aspectRatio="1:1"
           >
             {/* <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
