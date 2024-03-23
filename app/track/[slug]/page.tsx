@@ -178,15 +178,15 @@ export default async function Track({
         state={state}
         previousFrame={previousFrame}
       >
-          <FrameImage aspectRatio="1:1">
-            <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
+          <FrameImage src='https://content.spinamp.xyz/image/upload/v1711182176/o3hrzk3iypsjfdoknxk0.gif' aspectRatio="1:1">
+            {/* <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
               <div tw="flex flex-row">It looks like Farcaster account is not associated with any Spinamp account</div>
               <div>Spinamp is a music app filled with tons of amazing onchain music and artists to discover</div>
-              <div>If you want to play music without leaving this frame:</div>
+              <div>Download Spinamp to play music without leaving the frame!:</div>
               <div tw="flex flex-row">- Download Spinamp</div>
               <div tw="flex flex-row">- Sign up using any wallet you&apos;ve verified on Farcaster</div>
               <div tw="flex flex-row">- Enable notifications and then try again!</div>
-            </div>
+            </div> */}
           </FrameImage>
           <FrameButton
           action="link"
