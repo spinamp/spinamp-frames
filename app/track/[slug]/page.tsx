@@ -323,6 +323,12 @@ export default async function Track({
               <div tw="flex flex-row">open spinamp to discover more</div>
             </div>
           </FrameImage>
+          <FrameButton
+            action="link"
+            target={`https://app.spinamp.xyz/track/${slug}`}
+          >
+            like & follow
+          </FrameButton>
         </FrameContainer>
       </div>
     );
