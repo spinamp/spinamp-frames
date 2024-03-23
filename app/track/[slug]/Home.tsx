@@ -24,7 +24,8 @@ export async function Home({
   acceptedProtocols,
   track,
 }: HomeProps) {
-  const { isCollectable, chainSupported } = await isTrackCollectable(track.id);
+  const { isCollectable, chainSupported, mintResult } =
+    await isTrackCollectable(track.id);
 
   const safeTitle = safeString(track!.title);
   const safeArtistName = safeString(track!.artist.name);
@@ -33,7 +34,8 @@ export async function Home({
     track!.lossyArtworkIPFSHash!,
     safeTitle,
     safeArtistName,
-    isCollectable
+    isCollectable,
+    mintResult
   );
 
   return (

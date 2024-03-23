@@ -1,12 +1,20 @@
+import { formatUnits } from "ethers/lib/utils";
+
 export const makeTrackFrameImageURL = (
   trackImageIPFSHash: string,
   trackTitle: string,
   artistName: string,
-  isCollectable: boolean
+  isCollectable: boolean,
+  mintResult: any
 ) => {
-  const soldOut = !isCollectable
-    ? `/co_rgb:e0a307,l_text:helvetica_20_normal_left:SOLD OUT/fl_layer_apply,g_west,x_250,y_280`
-    : "";
+  const priceString =
+    isCollectable && mintResult
+      ? `${formatUnits(
+          mintResult.price.value,
+          Number.parseInt(mintResult.price.asset.decimals)
+        )} ${mintResult.price.asset.symbol}`
+      : "SOLD OUT";
+  const price = `/co_rgb:e0a307,l_text:helvetica_20_normal_left:${priceString}/fl_layer_apply,g_west,x_250,y_280`;
 
   return (
     `https://content.spinamp.xyz/spinamp-prod/image/upload/c_fill,h_450,w_600` +
@@ -15,7 +23,7 @@ export const makeTrackFrameImageURL = (
     `/l_nsbiafuxqisj4li5b9vp/c_scale,h_40,w_20/fl_layer_apply,x_-200,y_280` + // arrow
     `/co_rgb:FFFFFF,l_text:helvetica_26_bold_normal_left:${trackTitle}/fl_layer_apply,g_west,x_170,y_200` + // title
     `/co_rgb:FFFFFF,l_text:helvetica_20_normal_left:${artistName}/fl_layer_apply,g_west,x_170,y_240` + // artist
-    soldOut +
+    price +
     `/ipfs_image/${trackImageIPFSHash}` // album art
   );
 };

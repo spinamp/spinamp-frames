@@ -144,6 +144,7 @@ export const SUPPORTED_CHAINS = [10, 8453, 7777777];
 export async function isTrackCollectable(trackId: string): Promise<{
   isCollectable: boolean;
   chainSupported: boolean;
+  mintResult: any;
 }> {
   const mintResult = await getMintDetails(
     trackId,
@@ -154,6 +155,7 @@ export async function isTrackCollectable(trackId: string): Promise<{
     return {
       isCollectable: false,
       chainSupported: false,
+      mintResult,
     };
   }
 
@@ -162,6 +164,7 @@ export async function isTrackCollectable(trackId: string): Promise<{
     chainSupported: SUPPORTED_CHAINS.includes(
       mintResult.mintTransaction.chainId
     ),
+    mintResult,
   };
 }
 
