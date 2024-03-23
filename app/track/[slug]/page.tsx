@@ -10,8 +10,14 @@ import {
   useFramesReducer,
 } from "frames.js/next/server";
 import Link from "next/link";
-import { currentURL, sendNotification, sendPinataAnalytics } from "../../utils";
+import {
+  currentURL,
+  getSpinampUserId,
+  sendNotification,
+  sendPinataAnalytics,
+} from "../../utils";
 import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
+import { getAddress } from "ethers/lib/utils";
 
 enum Page {
   HOME,
@@ -90,6 +96,24 @@ export default async function Track({
   console.log("got frame message", frameMessage);
 
   const track = await fetchTrackBySlug(slug);
+  let spindexerUserId;
+  if (!spindexerUserId && frameMessage) {
+    // find spinamp user based on connected address, verified addresses and custody address
+    const addresses = [frameMessage.requesterCustodyAddress];
+
+    if (frameMessage.connectedAddress) {
+      addresses.push(frameMessage.connectedAddress);
+    }
+
+    if (frameMessage.requesterVerifiedAddresses.length > 0) {
+      addresses.push(...frameMessage.requesterVerifiedAddresses);
+    }
+
+    spindexerUserId = await getSpinampUserId(
+      addresses.map((address) => getAddress(address))
+    );
+    console.log("got spindexer user id", spindexerUserId);
+  }
 
   if (state.currentPage === Page.HOME) {
     // then, when done, return next frame
@@ -128,14 +152,21 @@ export default async function Track({
   }
 
   if (state.currentPage === Page.LISTEN) {
-    // send notification
-    await sendNotification({
-      spindexerUserId: "0x181BbB3acd071443F0e4c7d1F01fC821e3CC508a",
-      artistName: track!.artist.name,
-      trackId: track!.id,
-      trackTitle: track!.title,
-      trackUrl: `https://app.spinamp.xyz/track/${(params as any).slug}`,
-    });
+    if (spindexerUserId) {
+      // send notification
+      await sendNotification({
+        spindexerUserId,
+        artistName: track!.artist.name,
+        trackId: track!.id,
+        trackTitle: track!.title,
+        trackUrl: `https://app.spinamp.xyz/track/${(params as any).slug}`,
+      });
+    } else {
+      // todo: render the onboarding card
+      // todo: we will also have to make sure the user:
+      // - has connected a wallet to spinamp
+      // - has either verified the same wallet on their farcaster account, connected it to warpcast, or uses it as the custody address for their fID
+    }
 
     // then, when done, return next frame
     return (
