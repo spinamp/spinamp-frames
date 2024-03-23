@@ -19,6 +19,8 @@ import {
 import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
 import { getAddress } from "ethers/lib/utils";
 
+import {makeTrackFrameImageURL} from "../../helpers/image-gen";
+
 enum Page {
   HOME,
   LISTEN,
@@ -115,6 +117,10 @@ export default async function Track({
     console.log("got spindexer user id", spindexerUserId);
   }
 
+  const safeTitle = track!.title.replace(/[,%/]/g, "");
+  const safeArtistName = track!.artist.name.replace(/[,%/]/g, "");
+  const artworkURL = makeTrackFrameImageURL(track!.lossyArtworkIPFSHash!, safeTitle, safeArtistName);
+
   if (state.currentPage === Page.HOME) {
     // then, when done, return next frame
     return (
@@ -126,19 +132,7 @@ export default async function Track({
           state={state}
           previousFrame={previousFrame}
         >
-          <FrameImage aspectRatio="1.91:1">
-            <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
-              <div tw="flex flex-row">
-                <img
-                  width={200}
-                  src={getResizedArtworkUrl(track!.lossyArtworkUrl!, 200)}
-                  alt="frame image"
-                />
-              </div>
-              <div tw="flex flex-row">{track?.title}</div>
-              <div tw="flex flex-row">{track?.artist.name}</div>
-            </div>
-          </FrameImage>
+          <FrameImage src={artworkURL} aspectRatio="1:1" />
           <FrameButton>Listen</FrameButton>
           <FrameButton
             action="link"

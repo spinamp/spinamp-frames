@@ -1875,6 +1875,15 @@
     graphql "^16.5.0"
     graphql-request "^4.3.0"
 
+"@spinamp/spinamp-sdk@^0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@spinamp/spinamp-sdk/-/spinamp-sdk-0.0.13.tgz#9127f58f36d87cab8d885e1ace26be0fcb7cec4b"
+  integrity sha512-FR5tuozn9hGkZjKINHins5I08IQ80NPxbYCUJA5CJveZOh1rNtiIOQbVzQWT1NGSjY9R3v51wJHYI6XsRND/UA==
+  dependencies:
+    ethers "^5.6.9"
+    graphql "^16.5.0"
+    graphql-request "^4.3.0"
+
 "@stablelib/aead@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/aead/-/aead-1.0.1.tgz#c4b1106df9c23d1b867eb9b276d8f42d5fc4c0c3"
