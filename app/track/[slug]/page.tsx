@@ -135,10 +135,16 @@ export default async function Track({
           <FrameImage src={artworkURL} aspectRatio="1:1" />
           <FrameButton>Listen</FrameButton>
           <FrameButton
+            action="tx"
+            target={`/track/${slug}/txdata?trackId=${track!.id}`}
+          >
+            Collect
+          </FrameButton>
+          <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
           >
-            open
+            Open on Spinamp
           </FrameButton>
         </FrameContainer>
       </div>
@@ -147,7 +153,6 @@ export default async function Track({
 
   if (state.currentPage === Page.LISTEN) {
     if (spindexerUserId) {
-      // send notification
       await sendNotification({
         spindexerUserId,
         artistName: track!.artist.name,
@@ -156,10 +161,41 @@ export default async function Track({
         trackUrl: `https://app.spinamp.xyz/track/${(params as any).slug}`,
       });
     } else {
-      // todo: render the onboarding card
-      // todo: we will also have to make sure the user:
-      // - has connected a wallet to spinamp
-      // - has either verified the same wallet on their farcaster account, connected it to warpcast, or uses it as the custody address for their fID
+      return <FrameContainer
+        pathname={`/track/${slug}`}
+        postUrl="/track/loaded/frames"
+        state={state}
+        previousFrame={previousFrame}
+      >
+          <FrameImage aspectRatio="1:1">
+            <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
+              <div tw="flex flex-row">It looks like Farcaster account is not associated with any Spinamp account</div>
+              <div>Spinamp is a music app filled with tons of amazing onchain music and artists to discover</div>
+              <div>If you want to play music without leaving this frame:</div>
+              <div tw="flex flex-row">- Download Spinamp</div>
+              <div tw="flex flex-row">- Sign up using any wallet you've verified on Farcaster</div>
+              <div tw="flex flex-row">- Enable notifications and then try again!</div>
+            </div>
+          </FrameImage>
+          <FrameButton
+          action="link"
+          target={`https://apps.apple.com/app/spinamp/id1613783898`}
+        >
+          Download
+      </FrameButton>
+      <FrameButton
+          action="link"
+          target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
+        >
+          Open on Spinamp
+      </FrameButton>
+      <FrameButton
+            action="tx"
+            target={`/track/${slug}/txdata?trackId=${track!.id}`}
+          >
+            Collect
+      </FrameButton>
+    </FrameContainer>
     }
 
     // then, when done, return next frame
@@ -172,7 +208,7 @@ export default async function Track({
           state={state}
           previousFrame={previousFrame}
         >
-          <FrameImage aspectRatio="1.91:1">
+          <FrameImage aspectRatio="1:1">
             <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
               <div tw="flex flex-row">long press notification to listen</div>
               <img
@@ -188,13 +224,13 @@ export default async function Track({
             action="tx"
             target={`/track/${slug}/txdata?trackId=${track!.id}`}
           >
-            collect
+            Collect
           </FrameButton>
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
           >
-            open
+            Open on Spinamp
           </FrameButton>
         </FrameContainer>
       </div>
@@ -212,7 +248,7 @@ export default async function Track({
           state={state}
           previousFrame={previousFrame}
         >
-          <FrameImage aspectRatio="1.91:1">
+          <FrameImage aspectRatio="1:1">
             <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
               <div tw="flex flex-row">long press notification to listen</div>
               <img
@@ -228,13 +264,13 @@ export default async function Track({
             action="tx"
             target={`/track/${slug}/txdata?trackId=${track!.id}`}
           >
-            collect
+            Collect
           </FrameButton>
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
           >
-            open
+            Open on Spinamp
           </FrameButton>
         </FrameContainer>
       </div>
