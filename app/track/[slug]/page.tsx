@@ -1,4 +1,4 @@
-import { fetchTrackBySlug, getResizedArtworkUrl } from "@spinamp/spinamp-sdk";
+import { fetchTrackBySlug } from "@spinamp/spinamp-sdk";
 import {
   FrameReducer,
   NextServerPageProps,
@@ -8,17 +8,10 @@ import {
 } from "frames.js/next/server";
 import {
   getSpinampUserIds,
-  isTrackCollectable,
   sendNotification,
   sendPinataAnalytics,
 } from "../../utils";
 import { getAddress } from "ethers/lib/utils";
-import { getXmtpFrameMessage, isXmtpFrameActionPayload } from "frames.js/xmtp";
-
-import {
-  makeListenFrameImageURL,
-  makeTrackFrameImageURL,
-} from "../../helpers/image-gen";
 import { ClientProtocolId } from "frames.js";
 import { Home } from "./Home";
 import { Onboarding } from "./Onboarding";
@@ -108,45 +101,31 @@ export default async function Track({
     previousFrame
   );
 
-  let frameMessage;
-  // if (
-  //   previousFrame.postBody &&
-  //   isXmtpFrameActionPayload(previousFrame.postBody)
-  // ) {
-  //   frameMessage = await getXmtpFrameMessage(previousFrame.postBody);
-  // } else {
-  frameMessage = await getFrameMessage(previousFrame.postBody);
-  // }
-  const messageTime = performance.now();
-  console.log("Time until got frame message", messageTime - startTime);
-  // console.log("got frame message", frameMessage);
+  console.log("previous frame", previousFrame);
 
-  const track = await fetchTrackBySlug(slug);
-  const trackSlugTime = performance.now();
-  console.log("Time until got track slug", trackSlugTime - startTime);
+  const frameMessage = await getFrameMessage(previousFrame.postBody);
 
-  let spindexerUserIds: string[] = [];
-  if (spindexerUserIds.length === 0 && frameMessage) {
-    // find spinamp user based on connected address, verified addresses and custody address
-    const addresses = [frameMessage.requesterCustodyAddress];
-
-    if (frameMessage.connectedAddress) {
-      addresses.push(frameMessage.connectedAddress);
+  async function fetchUserIds() {
+    if (frameMessage) {
+      const addresses = [frameMessage.requesterCustodyAddress];
+      if (frameMessage.connectedAddress) {
+        addresses.push(frameMessage.connectedAddress);
+      }
+      if (frameMessage.requesterVerifiedAddresses.length > 0) {
+        addresses.push(...frameMessage.requesterVerifiedAddresses);
+      }
+      const ids = getSpinampUserIds(
+        addresses.map((address) => getAddress(address))
+      );
+      return ids;
     }
-
-    if (frameMessage.requesterVerifiedAddresses.length > 0) {
-      addresses.push(...frameMessage.requesterVerifiedAddresses);
-    }
-
-    spindexerUserIds = await getSpinampUserIds(
-      addresses.map((address) => getAddress(address))
-    );
-
-    const userIdTime = performance.now();
-    console.log("Time until got user id", userIdTime - startTime);
-
-    // console.log("got spindexer user id", spindexerUserId);
+    return [];
   }
+
+  const [track, spindexerUserIds] = await Promise.all([
+    fetchTrackBySlug(slug),
+    fetchUserIds(),
+  ]);
 
   if (state.currentPage === Page.HOME) {
     return (

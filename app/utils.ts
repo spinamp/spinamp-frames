@@ -88,12 +88,6 @@ export async function getSpinampUserIds(
   addresses: string[]
 ): Promise<string[]> {
   const graphqlApi = new GraphQLClient(process.env.SPINAMP_GRAPHQL_ENDPOINT!);
-  console.log(
-    "search addresses",
-    addresses,
-    "at",
-    process.env.SPINAMP_GRAPHQL_ENDPOINT!
-  );
   const response: any = await graphqlApi.request(
     gql`
       query UserIdQuery($addresses: [String!]) {
@@ -127,12 +121,8 @@ export async function getMintDetails(trackId: string, userAddress: string) {
 
   const cheapestMint = mintData.sort((a: any, b: any) => {
     const diff = BigInt(a.price.value) - BigInt(b.price.value);
-    console.log("a", a.price.value, "b", b.price.value, "diff", diff);
     return diff < 0 ? -1 : diff > 0 ? 1 : 0;
   })[0];
-
-  console.log("got mint response", mintData);
-  console.log("cheapestMint", cheapestMint);
 
   if (cheapestMint.available) {
     return cheapestMint;
