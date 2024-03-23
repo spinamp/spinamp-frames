@@ -19,12 +19,13 @@ import {
 import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
 import { getAddress } from "ethers/lib/utils";
 
-import {makeTrackFrameImageURL} from "../../helpers/image-gen";
+import { makeTrackFrameImageURL } from "../../helpers/image-gen";
 
 enum Page {
   HOME,
   LISTEN,
   MINTED,
+  DONE,
 }
 
 type State = {
@@ -67,10 +68,10 @@ const reducer: FrameReducer<State> = (state, action) => {
       " i got an update from the listen page. that must mean the user minted"
     );
     page = Page.MINTED;
+  }
 
-    // TODO: update the current page to TX_SENT
-    // show transaction hash
-    // show like & follow buttons?
+  if (state.currentPage === Page.MINTED) {
+    page = Page.DONE;
   }
 
   return {
@@ -82,9 +83,8 @@ const reducer: FrameReducer<State> = (state, action) => {
 export default async function Track({
   searchParams,
   params,
-  ...rest
 }: NextServerPageProps) {
-  const startTime = Date.now();
+  const startTime = performance.now();
   console.log("Time started");
 
   const slug = (params as any).slug;
@@ -97,12 +97,12 @@ export default async function Track({
   const frameMessage = await getFrameMessage(previousFrame.postBody, {
     hubHttpUrl: DEFAULT_DEBUGGER_HUB_URL,
   });
-  const messageTime = Date.now();
+  const messageTime = performance.now();
   console.log("Time until got frame message", messageTime - startTime);
   // console.log("got frame message", frameMessage);
 
   const track = await fetchTrackBySlug(slug);
-  const trackSlugTime = Date.now();
+  const trackSlugTime = performance.now();
   console.log("Time until got track slug", trackSlugTime - startTime);
 
   let spindexerUserId;
@@ -122,7 +122,7 @@ export default async function Track({
       addresses.map((address) => getAddress(address))
     );
 
-    const userIdTime = Date.now();
+    const userIdTime = performance.now();
     console.log("Time until got user id", userIdTime - startTime);
 
     // console.log("got spindexer user id", spindexerUserId);
@@ -130,7 +130,11 @@ export default async function Track({
 
   const safeTitle = track!.title.replace(/[,%/]/g, "");
   const safeArtistName = track!.artist.name.replace(/[,%/]/g, "");
-  const artworkURL = makeTrackFrameImageURL(track!.lossyArtworkIPFSHash!, safeTitle, safeArtistName);
+  const artworkURL = makeTrackFrameImageURL(
+    track!.lossyArtworkIPFSHash!,
+    safeTitle,
+    safeArtistName
+  );
 
   if (state.currentPage === Page.HOME) {
     // then, when done, return next frame
@@ -139,7 +143,7 @@ export default async function Track({
         Mint button example <Link href={createDebugUrl(url)}>Debug</Link>
         <FrameContainer
           pathname={`/track/${slug}`}
-          postUrl="/track/loaded/frames"
+          postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
         >
@@ -172,13 +176,17 @@ export default async function Track({
         trackUrl: `https://app.spinamp.xyz/track/${(params as any).slug}`,
       });
     } else {
-      return <FrameContainer
-        pathname={`/track/${slug}`}
-        postUrl="/track/loaded/frames"
-        state={state}
-        previousFrame={previousFrame}
-      >
-          <FrameImage src='https://content.spinamp.xyz/image/upload/v1711182176/o3hrzk3iypsjfdoknxk0.gif' aspectRatio="1:1">
+      return (
+        <FrameContainer
+          pathname={`/track/${slug}`}
+          postUrl={`/track/${slug}/frames`}
+          state={state}
+          previousFrame={previousFrame}
+        >
+          <FrameImage
+            src="https://content.spinamp.xyz/image/upload/v1711182176/o3hrzk3iypsjfdoknxk0.gif"
+            aspectRatio="1:1"
+          >
             {/* <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
               <div tw="flex flex-row">It looks like Farcaster account is not associated with any Spinamp account</div>
               <div>Spinamp is a music app filled with tons of amazing onchain music and artists to discover</div>
@@ -189,18 +197,19 @@ export default async function Track({
             </div> */}
           </FrameImage>
           <FrameButton
-          action="link"
-          target={`https://apps.apple.com/app/spinamp/id1613783898`}
-        >
-          Download
-      </FrameButton>
-      <FrameButton
+            action="link"
+            target={`https://apps.apple.com/app/spinamp/id1613783898`}
+          >
+            Download
+          </FrameButton>
+          <FrameButton
             action="tx"
             target={`/track/${slug}/txdata?trackId=${track!.id}`}
           >
             Collect
-      </FrameButton>
-    </FrameContainer>
+          </FrameButton>
+        </FrameContainer>
+      );
     }
 
     // then, when done, return next frame
@@ -209,11 +218,11 @@ export default async function Track({
         Mint button example <Link href={createDebugUrl(url)}>Debug</Link>
         <FrameContainer
           pathname={`/track/${slug}`}
-          postUrl="/track/loaded/frames"
+          postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
         >
-          <FrameImage src={artworkURL}  aspectRatio="1:1" />
+          <FrameImage src={artworkURL} aspectRatio="1:1" />
           <FrameButton
             action="tx"
             target={`/track/${slug}/txdata?trackId=${track!.id}`}
@@ -235,37 +244,56 @@ export default async function Track({
     // then, when done, return next frame
     return (
       <div>
-        Mint button example <Link href={createDebugUrl(url)}>Debug</Link>
         <FrameContainer
           pathname={`/track/${slug}`}
-          postUrl="/track/loaded/frames"
+          postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
         >
           <FrameImage aspectRatio="1:1">
-            <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
-              <div tw="flex flex-row">long press notification to listen</div>
-              <img
-                width={200}
-                src={getResizedArtworkUrl(track!.lossyArtworkUrl!, 200)}
-                alt="frame image"
-              />
-              <div tw="flex flex-row">{track?.title}</div>
-              <div tw="flex flex-row">{track?.artist.name}</div>
+            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center flex flex-col space-y-4">
+              <div tw="flex flex-row">Transaction sent!</div>
+              <div tw="flex flex-row space-x-4">
+                <div tw="flex flex-col">
+                  <img
+                    src="https://spinamp.mypinata.cloud/ipfs/QmYBB27uZJzPLVoRnZaZr3wQLjRibd47TBeVzRRLePDjYG"
+                    width={200}
+                    height={200}
+                  />
+                </div>
+                <div tw="flex flex-col text-8xl">{"<3"}</div>
+                <div tw="flex flex-col">
+                  <img
+                    src={getResizedArtworkUrl(track?.lossyArtworkUrl, 200)}
+                    width={200}
+                    height={200}
+                  />
+                </div>
+              </div>
             </div>
           </FrameImage>
-          <FrameButton
-            action="tx"
-            target={`/track/${slug}/txdata?trackId=${track!.id}`}
-          >
-            Collect
-          </FrameButton>
-          <FrameButton
-            action="link"
-            target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
-          >
-            More
-          </FrameButton>
+          <FrameButton>{`Follow ${safeArtistName}`}</FrameButton>
+          <FrameButton>Like</FrameButton>
+        </FrameContainer>
+      </div>
+    );
+  }
+
+  if (state.currentPage === Page.DONE) {
+    return (
+      <div>
+        <FrameContainer
+          pathname={`/track/${slug}`}
+          postUrl={`/track/${slug}/frames`}
+          state={state}
+          previousFrame={previousFrame}
+        >
+          <FrameImage aspectRatio="1:1">
+            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center flex flex-col space-y-4">
+              <div tw="flex flex-row">Coming soon!</div>
+              <div tw="flex flex-row">open spinamp to discover more</div>
+            </div>
+          </FrameImage>
         </FrameContainer>
       </div>
     );
