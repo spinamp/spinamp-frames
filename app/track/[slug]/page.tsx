@@ -19,11 +19,24 @@ import {
 } from "../../utils";
 import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
 import { getAddress } from "ethers/lib/utils";
+import { getXmtpFrameMessage, isXmtpFrameActionPayload } from "frames.js/xmtp";
 
 import {
   makeListenFrameImageURL,
   makeTrackFrameImageURL,
 } from "../../helpers/image-gen";
+import { ClientProtocolId } from "frames.js";
+
+const acceptedProtocols: ClientProtocolId[] = [
+  {
+    id: "xmtp",
+    version: "vNext",
+  },
+  {
+    id: "farcaster",
+    version: "vNext",
+  },
+];
 
 enum Page {
   HOME,
@@ -92,9 +105,16 @@ export default async function Track({
   const url = currentURL("/examples/mint-button");
   const previousFrame = getPreviousFrame<State>(searchParams);
   const [state] = useFramesReducer<State>(reducer, initialState, previousFrame);
-  const frameMessage = await getFrameMessage(previousFrame.postBody, {
-    hubHttpUrl: DEFAULT_DEBUGGER_HUB_URL,
-  });
+
+  let frameMessage;
+  // if (
+  //   previousFrame.postBody &&
+  //   isXmtpFrameActionPayload(previousFrame.postBody)
+  // ) {
+  //   frameMessage = await getXmtpFrameMessage(previousFrame.postBody);
+  // } else {
+  frameMessage = await getFrameMessage(previousFrame.postBody);
+  // }
   const messageTime = performance.now();
   console.log("Time until got frame message", messageTime - startTime);
   // console.log("got frame message", frameMessage);
@@ -137,6 +157,21 @@ export default async function Track({
     safeArtistName
   );
 
+  const CollectButton = () => {
+    if (!isCollectable) {
+      return null;
+    }
+
+    return (
+      <FrameButton
+        action="tx"
+        target={`/track/${slug}/txdata?trackId=${track!.id}`}
+      >
+        Collect
+      </FrameButton>
+    );
+  };
+
   if (state.currentPage === Page.HOME) {
     // then, when done, return next frame
     return (
@@ -147,17 +182,11 @@ export default async function Track({
           postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
+          accepts={acceptedProtocols}
         >
           <FrameImage src={artworkURL} aspectRatio="1:1" />
           <FrameButton>Play 🎧</FrameButton>
-          {isCollectable && (
-            <FrameButton
-              action="tx"
-              target={`/track/${slug}/txdata?trackId=${track!.id}`}
-            >
-              Collect
-            </FrameButton>
-          )}
+          <CollectButton />
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
@@ -185,6 +214,7 @@ export default async function Track({
           postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
+          accepts={acceptedProtocols}
         >
           <FrameImage
             src="https://spinamp.mypinata.cloud/ipfs/Qmf9qgVShudRcyDLY8esEH9iUS6yX7wms5NcpkeRyoyzCW"
@@ -205,14 +235,7 @@ export default async function Track({
           >
             Download
           </FrameButton>
-          {isCollectable && (
-            <FrameButton
-              action="tx"
-              target={`/track/${slug}/txdata?trackId=${track!.id}`}
-            >
-              Collect
-            </FrameButton>
-          )}
+          <CollectButton />
         </FrameContainer>
       );
     }
@@ -231,16 +254,10 @@ export default async function Track({
           postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
+          accepts={acceptedProtocols}
         >
           <FrameImage src={listenImageUrl} aspectRatio="1:1" />
-          {isCollectable && (
-            <FrameButton
-              action="tx"
-              target={`/track/${slug}/txdata?trackId=${track!.id}`}
-            >
-              Collect
-            </FrameButton>
-          )}
+          <CollectButton />
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
@@ -261,6 +278,7 @@ export default async function Track({
           postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
+          accepts={acceptedProtocols}
         >
           <FrameImage
             aspectRatio="1:1"
@@ -295,6 +313,7 @@ export default async function Track({
           postUrl={`/track/${slug}/frames`}
           state={state}
           previousFrame={previousFrame}
+          accepts={acceptedProtocols}
         >
           <FrameImage aspectRatio="1:1">
             <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center flex flex-col space-y-4">
