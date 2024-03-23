@@ -233,12 +233,14 @@ export default async function Track({
           previousFrame={previousFrame}
         >
           <FrameImage src={listenImageUrl} aspectRatio="1:1" />
-          <FrameButton
-            action="tx"
-            target={`/track/${slug}/txdata?trackId=${track!.id}`}
-          >
-            Collect
-          </FrameButton>
+          {isCollectable && (
+            <FrameButton
+              action="tx"
+              target={`/track/${slug}/txdata?trackId=${track!.id}`}
+            >
+              Collect
+            </FrameButton>
+          )}
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
