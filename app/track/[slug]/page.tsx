@@ -173,7 +173,7 @@ export default async function Track({
               <div>Spinamp is a music app filled with tons of amazing onchain music and artists to discover</div>
               <div>If you want to play music without leaving this frame:</div>
               <div tw="flex flex-row">- Download Spinamp</div>
-              <div tw="flex flex-row">- Sign up using any wallet you've verified on Farcaster</div>
+              <div tw="flex flex-row">- Sign up using any wallet you&apos;ve verified on Farcaster</div>
               <div tw="flex flex-row">- Enable notifications and then try again!</div>
             </div>
           </FrameImage>
