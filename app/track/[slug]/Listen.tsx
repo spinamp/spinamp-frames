@@ -7,38 +7,49 @@ import {
 import { CollectButton } from "./CollectButton";
 import { ClientProtocolId } from "frames.js";
 import { TrackFrameState } from "./page";
-import { isTrackCollectable } from "../../utils";
+import { isTrackCollectable, safeString } from "../../utils";
+import { ITrack } from "@spinamp/spinamp-sdk";
+import { makeListenFrameImageURL } from "../../helpers/image-gen";
 
 type Props = {
-  slug: string;
   state: TrackFrameState;
   previousFrame: PreviousFrame<TrackFrameState>;
   acceptedProtocols: ClientProtocolId[];
-  artworkURL: string;
-  trackId: string;
-  imageUrl: string;
+  track: ITrack;
 };
 
 export const Listen = async ({
   acceptedProtocols,
-  slug,
   state,
   previousFrame,
-  trackId,
-  imageUrl,
+  track,
 }: Props) => {
-  const { isCollectable, chainSupported } = await isTrackCollectable(trackId);
+  const { isCollectable, chainSupported } = await isTrackCollectable(track.id);
+
+  const safeTitle = safeString(track!.title);
+  const safeArtistName = safeString(track!.artist.name);
+
+  const listenImageUrl = makeListenFrameImageURL(
+    track!.lossyArtworkIPFSHash!,
+    safeTitle,
+    safeArtistName
+  );
 
   return (
     <FrameContainer
-      pathname={`/track/${slug}`}
-      postUrl={`/track/${slug}/frames`}
+      pathname={`/track/${track.slug}`}
+      postUrl={`/track/${track.slug}/frames`}
       state={state}
       previousFrame={previousFrame}
       accepts={acceptedProtocols}
     >
-      <FrameImage src={imageUrl} aspectRatio="1:1" />
-      {CollectButton({ chainSupported, isCollectable, slug, trackId })}
+      <FrameImage src={listenImageUrl} aspectRatio="1:1" />
+      {CollectButton({
+        chainSupported,
+        isCollectable,
+        slug: track.slug,
+        trackId: track.id,
+      })}
       <FrameButton
         action="link"
         target={`https://app.spinamp.xyz/track/${slug}`}

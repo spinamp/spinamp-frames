@@ -12,7 +12,6 @@ type Props = {
   state: TrackFrameState;
   previousFrame: PreviousFrame<TrackFrameState>;
   acceptedProtocols: ClientProtocolId[];
-  artworkURL: string;
   trackId: string;
 };
 

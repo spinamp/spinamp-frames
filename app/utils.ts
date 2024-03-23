@@ -164,3 +164,7 @@ export async function isTrackCollectable(trackId: string): Promise<{
     ),
   };
 }
+
+export function safeString(string: string) {
+  return string.replace(/[,%/]/g, "");
+}

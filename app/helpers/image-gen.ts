@@ -1,9 +1,23 @@
 export const makeTrackFrameImageURL = (
   trackImageIPFSHash: string,
   trackTitle: string,
-  artistName: string
+  artistName: string,
+  isCollectable: boolean
 ) => {
-  return `https://content.spinamp.xyz/spinamp-prod/image/upload/c_fill,h_450,w_600/l_icj2i9l7buaqgysbkjov/c_scale,h_150,w_600/fl_layer_apply,y_300/l_mswxugaoxwes9etdnelw/c_scale,h_100,w_100/fl_layer_apply,x_-200,y_225/l_nsbiafuxqisj4li5b9vp/c_scale,h_40,w_20/fl_layer_apply,x_-200,y_280/co_rgb:FFFFFF,l_text:helvetica_26_bold_normal_left:${trackTitle}/fl_layer_apply,g_west,x_170,y_200/co_rgb:FFFFFF,l_text:helvetica_20_normal_left:${artistName}/fl_layer_apply,g_west,x_170,y_240/ipfs_image/${trackImageIPFSHash}`;
+  const soldOut = !isCollectable
+    ? `/co_rgb:e0a307,l_text:helvetica_20_normal_left:SOLD OUT/fl_layer_apply,g_west,x_250,y_280`
+    : "";
+
+  return (
+    `https://content.spinamp.xyz/spinamp-prod/image/upload/c_fill,h_450,w_600` +
+    `/l_icj2i9l7buaqgysbkjov/c_scale,h_150,w_600/fl_layer_apply,y_300` + // bottom bar
+    `/l_mswxugaoxwes9etdnelw/c_scale,h_100,w_100/fl_layer_apply,x_-200,y_225` + // play button
+    `/l_nsbiafuxqisj4li5b9vp/c_scale,h_40,w_20/fl_layer_apply,x_-200,y_280` + // arrow
+    `/co_rgb:FFFFFF,l_text:helvetica_26_bold_normal_left:${trackTitle}/fl_layer_apply,g_west,x_170,y_200` + // title
+    `/co_rgb:FFFFFF,l_text:helvetica_20_normal_left:${artistName}/fl_layer_apply,g_west,x_170,y_240` + // artist
+    soldOut +
+    `/ipfs_image/${trackImageIPFSHash}` // album art
+  );
 };
 
 export const makeListenFrameImageURL = (

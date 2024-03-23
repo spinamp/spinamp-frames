@@ -7,31 +7,39 @@ import {
 } from "frames.js/next/server";
 import { TrackFrameState } from "./page";
 import { CollectButton } from "./CollectButton";
-import { isTrackCollectable } from "../../utils";
+import { isTrackCollectable, safeString } from "../../utils";
+import { makeTrackFrameImageURL } from "../../helpers/image-gen";
+import { ITrack } from "@spinamp/spinamp-sdk";
 
 type HomeProps = {
-  slug: string;
   state: TrackFrameState;
   previousFrame: PreviousFrame<TrackFrameState>;
   acceptedProtocols: ClientProtocolId[];
-  artworkURL: string;
-  trackId: string;
+  track: ITrack;
 };
 
 export async function Home({
-  slug,
   state,
   previousFrame,
   acceptedProtocols,
-  artworkURL,
-  trackId,
+  track,
 }: HomeProps) {
-  const { isCollectable, chainSupported } = await isTrackCollectable(trackId);
+  const { isCollectable, chainSupported } = await isTrackCollectable(track.id);
+
+  const safeTitle = safeString(track!.title);
+  const safeArtistName = safeString(track!.artist.name);
+
+  const artworkURL = makeTrackFrameImageURL(
+    track!.lossyArtworkIPFSHash!,
+    safeTitle,
+    safeArtistName,
+    isCollectable
+  );
 
   return (
     <FrameContainer
-      pathname={`/track/${slug}`}
-      postUrl={`/track/${slug}/frames`}
+      pathname={`/track/${track.slug}`}
+      postUrl={`/track/${track.slug}/frames`}
       state={state}
       previousFrame={previousFrame}
       accepts={acceptedProtocols}
@@ -40,11 +48,16 @@ export async function Home({
       <FrameButton>Play 🎧</FrameButton>
       {/* only show the collect button here if the track is collectable */}
       {chainSupported
-        ? CollectButton({ isCollectable, slug, trackId, chainSupported })
+        ? CollectButton({
+            isCollectable,
+            slug: track.slug,
+            trackId: track.id,
+            chainSupported,
+          })
         : null}
       <FrameButton
         action="link"
-        target={`https://app.spinamp.xyz/track/${slug}`}
+        target={`https://app.spinamp.xyz/track/${track.slug}`}
       >
         More
       </FrameButton>

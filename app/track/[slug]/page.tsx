@@ -148,23 +148,13 @@ export default async function Track({
     // console.log("got spindexer user id", spindexerUserId);
   }
 
-  const safeTitle = track!.title.replace(/[,%/]/g, "");
-  const safeArtistName = track!.artist.name.replace(/[,%/]/g, "");
-  const artworkURL = makeTrackFrameImageURL(
-    track!.lossyArtworkIPFSHash!,
-    safeTitle,
-    safeArtistName
-  );
-
   if (state.currentPage === Page.HOME) {
     return (
       <Home
         acceptedProtocols={acceptedProtocols}
-        artworkURL={artworkURL}
         previousFrame={previousFrame}
-        slug={slug}
         state={state}
-        trackId={track!.id}
+        track={track!}
       />
     );
   }
@@ -178,27 +168,19 @@ export default async function Track({
         trackTitle: track!.title,
         trackUrl: `https://app.spinamp.xyz/track/${(params as any).slug}`,
       });
-      const listenImageUrl = makeListenFrameImageURL(
-        track!.lossyArtworkIPFSHash!,
-        safeTitle,
-        safeArtistName
-      );
+
       return (
         <Listen
           acceptedProtocols={acceptedProtocols}
-          artworkURL={artworkURL}
           previousFrame={previousFrame}
-          slug={slug}
           state={state}
-          trackId={track!.id}
-          imageUrl={listenImageUrl}
+          track={track!}
         />
       );
     } else {
       return (
         <Onboarding
           acceptedProtocols={acceptedProtocols}
-          artworkURL={artworkURL}
           previousFrame={previousFrame}
           slug={slug}
           state={state}
@@ -212,7 +194,6 @@ export default async function Track({
     return (
       <Minted
         acceptedProtocols={acceptedProtocols}
-        artworkURL={artworkURL}
         previousFrame={previousFrame}
         state={state}
         track={track!}
@@ -224,7 +205,6 @@ export default async function Track({
     return (
       <Done
         acceptedProtocols={acceptedProtocols}
-        artworkURL={artworkURL}
         previousFrame={previousFrame}
         state={state}
         track={track!}
