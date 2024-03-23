@@ -36,6 +36,7 @@ export async function POST(
 
   console.log("got mint response", mintData);
   console.log("cheapestMint", cheapestMint);
+  // TODO: maybe should be able to browse different tiers if there are multiple and pick one?
 
   if (!cheapestMint.available) {
     // TODO: should probably check this before hand and not show the collect button??
