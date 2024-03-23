@@ -264,10 +264,10 @@ export default async function Track({
             aspectRatio="1:1"
             // src={makeCollectedFrameImageURL(safeTitle, safeArtistName)}
           >
-            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center p-8 flex flex-col space-y-4">
+            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center p-10 flex flex-col space-y-4">
               <div tw="flex flex-row justify-center mb-10">
                 <img
-                  src="https://spinamp.mypinata.cloud/ipfs/Qma9bvCyW635Ce5b7fZWwAaXvWL2iG3YRsh1BvqfABcrXR"
+                  src="https://spinamp.mypinata.cloud/ipfs/QmV4248XpCLqDS2tvGMwaDJsUgYif8LgUqgyPFfw6aL4jm"
                   width={200}
                   height={200}
                 />
