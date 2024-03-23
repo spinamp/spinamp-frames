@@ -36,7 +36,7 @@ type State = {
   currentPage: Page;
 };
 
-const initialState = { currentPage: Page.MINTED };
+const initialState = { currentPage: Page.HOME };
 
 const reducer: FrameReducer<State> = (state, action) => {
   if (action.postBody?.trustedData) {
@@ -170,7 +170,7 @@ export default async function Track({
   }
 
   if (state.currentPage === Page.LISTEN) {
-    if (!spindexerUserIds || spindexerUserIds?.length === 0) {
+    if (spindexerUserIds && spindexerUserIds?.length > 0) {
       sendNotification({
         spindexerUserIds,
         artistName: track!.artist.name,

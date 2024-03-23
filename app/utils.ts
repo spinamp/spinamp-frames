@@ -51,7 +51,7 @@ export async function sendPinataAnalytics(body: PinataAnalyticsBody) {
 
 export async function sendNotification(payload: {
   trackId: string;
-  spindexerUserId: string;
+  spindexerUserIds: string[];
   trackUrl: string;
   trackTitle: string;
   artistName: string;
@@ -84,9 +84,9 @@ async function signMessage(message: string) {
   return wallet.signMessage(message);
 }
 
-export async function getSpinampUserId(
+export async function getSpinampUserIds(
   addresses: string[]
-): Promise<string | undefined> {
+): Promise<string[]> {
   const graphqlApi = new GraphQLClient(process.env.SPINAMP_GRAPHQL_ENDPOINT!);
   console.log(
     "search addresses",
@@ -112,11 +112,10 @@ export async function getSpinampUserId(
   const nodes = response.allAddresses.nodes;
 
   if (nodes.length === 0) {
-    return undefined;
+    return [];
   }
 
-  // TODO: what should we do if there is more than one spindexer user??
-  return nodes.map((node: any) => node.userId).at(0);
+  return nodes.map((node: any) => node.userId);
 }
 
 export async function getMintDetails(trackId: string, userAddress: string) {
