@@ -186,7 +186,7 @@ export default async function Track({
         >
           <FrameImage src={artworkURL} aspectRatio="1:1" />
           <FrameButton>Play 🎧</FrameButton>
-          <CollectButton />
+          {CollectButton()}
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
@@ -235,7 +235,9 @@ export default async function Track({
           >
             Download
           </FrameButton>
-          <CollectButton />
+          {/* <FrameButton action="post_redirect" target={`/track/${slug}`}>
+            Back
+          </FrameButton> */}
         </FrameContainer>
       );
     }
@@ -257,13 +259,13 @@ export default async function Track({
           accepts={acceptedProtocols}
         >
           <FrameImage src={listenImageUrl} aspectRatio="1:1" />
-          <CollectButton />
-          <FrameButton
+          {CollectButton()}
+          {/* <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
           >
             Open on Spinamp
-          </FrameButton>
+          </FrameButton> */}
         </FrameContainer>
       </div>
     );
