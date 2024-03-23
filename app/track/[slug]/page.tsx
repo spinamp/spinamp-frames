@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import {
   currentURL,
-  getSpinampUserId,
+  getSpinampUserIds,
   isTrackCollectable,
   sendNotification,
   sendPinataAnalytics,
@@ -20,7 +20,10 @@ import {
 import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
 import { getAddress } from "ethers/lib/utils";
 
-import { makeTrackFrameImageURL } from "../../helpers/image-gen";
+import {
+  makeCollectedFrameImageURL,
+  makeTrackFrameImageURL,
+} from "../../helpers/image-gen";
 
 enum Page {
   HOME,
@@ -33,7 +36,7 @@ type State = {
   currentPage: Page;
 };
 
-const initialState = { currentPage: Page.HOME };
+const initialState = { currentPage: Page.MINTED };
 
 const reducer: FrameReducer<State> = (state, action) => {
   if (action.postBody?.trustedData) {
@@ -100,8 +103,8 @@ export default async function Track({
   const trackSlugTime = performance.now();
   console.log("Time until got track slug", trackSlugTime - startTime);
 
-  let spindexerUserId;
-  if (!spindexerUserId && frameMessage) {
+  let spindexerUserIds: string[] = [];
+  if (spindexerUserIds.length === 0 && frameMessage) {
     // find spinamp user based on connected address, verified addresses and custody address
     const addresses = [frameMessage.requesterCustodyAddress];
 
@@ -113,7 +116,7 @@ export default async function Track({
       addresses.push(...frameMessage.requesterVerifiedAddresses);
     }
 
-    spindexerUserId = await getSpinampUserId(
+    spindexerUserIds = await getSpinampUserIds(
       addresses.map((address) => getAddress(address))
     );
 
@@ -167,9 +170,9 @@ export default async function Track({
   }
 
   if (state.currentPage === Page.LISTEN) {
-    if (spindexerUserId) {
+    if (!spindexerUserIds || spindexerUserIds?.length === 0) {
       sendNotification({
-        spindexerUserId,
+        spindexerUserIds,
         artistName: track!.artist.name,
         trackId: track!.id,
         trackTitle: track!.title,
@@ -252,26 +255,22 @@ export default async function Track({
           state={state}
           previousFrame={previousFrame}
         >
-          <FrameImage aspectRatio="1:1">
-            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center flex flex-col space-y-4">
-              <div tw="flex flex-row">Transaction sent!</div>
-              <div tw="flex flex-row space-x-4">
-                <div tw="flex flex-col">
-                  <img
-                    src="https://spinamp.mypinata.cloud/ipfs/QmYBB27uZJzPLVoRnZaZr3wQLjRibd47TBeVzRRLePDjYG"
-                    width={200}
-                    height={200}
-                  />
-                </div>
-                <div tw="flex flex-col text-8xl">{"<3"}</div>
-                <div tw="flex flex-col">
-                  <img
-                    src={getResizedArtworkUrl(track?.lossyArtworkUrl, 200)}
-                    width={200}
-                    height={200}
-                  />
-                </div>
+          <FrameImage
+            aspectRatio="1:1"
+            // src={makeCollectedFrameImageURL(safeTitle, safeArtistName)}
+          >
+            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center p-8 flex flex-col space-y-4">
+              <div tw="flex flex-row justify-center mb-10">
+                <img
+                  src="https://spinamp.mypinata.cloud/ipfs/Qma9bvCyW635Ce5b7fZWwAaXvWL2iG3YRsh1BvqfABcrXR"
+                  width={200}
+                  height={200}
+                />
               </div>
+              <div tw="flex flex-row space-x-4 text-center text-7xl font-black mb-10">
+                Congratulations!
+              </div>
+              <div tw="flex flex-row space-y-4 text-center">{`You are the owner of ${safeTitle} by ${safeArtistName}. Let's celebrate!`}</div>
             </div>
           </FrameImage>
           <FrameButton>{`Follow ${safeArtistName}`}</FrameButton>
