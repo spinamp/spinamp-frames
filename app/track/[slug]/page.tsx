@@ -13,6 +13,7 @@ import Link from "next/link";
 import {
   currentURL,
   getSpinampUserId,
+  isTrackCollectable,
   sendNotification,
   sendPinataAnalytics,
 } from "../../utils";
@@ -52,9 +53,6 @@ const reducer: FrameReducer<State> = (state, action) => {
 
   // console.log("reducer got action", state, action);
   const buttonIndex = action.postBody?.untrustedData.buttonIndex;
-
-  console.log("~~~~~~~~~~~~~~~~~` got button index", buttonIndex);
-
   let page = state.currentPage;
 
   if (state.currentPage === Page.HOME) {
@@ -64,9 +62,6 @@ const reducer: FrameReducer<State> = (state, action) => {
   }
 
   if (state.currentPage === Page.LISTEN) {
-    console.log(
-      " i got an update from the listen page. that must mean the user minted"
-    );
     page = Page.MINTED;
   }
 
@@ -128,6 +123,9 @@ export default async function Track({
     // console.log("got spindexer user id", spindexerUserId);
   }
 
+  const isCollectable = await isTrackCollectable(track!.id);
+  console.log("is colletable", isCollectable);
+
   const safeTitle = track!.title.replace(/[,%/]/g, "");
   const safeArtistName = track!.artist.name.replace(/[,%/]/g, "");
   const artworkURL = makeTrackFrameImageURL(
@@ -135,6 +133,17 @@ export default async function Track({
     safeTitle,
     safeArtistName
   );
+
+  const CollectButton = () => {
+    return (
+      <FrameButton
+        action="tx"
+        target={`/track/${slug}/txdata?trackId=${track!.id}`}
+      >
+        Collect
+      </FrameButton>
+    );
+  };
 
   if (state.currentPage === Page.HOME) {
     // then, when done, return next frame
@@ -149,12 +158,14 @@ export default async function Track({
         >
           <FrameImage src={artworkURL} aspectRatio="1:1" />
           <FrameButton>Play 🎧</FrameButton>
-          <FrameButton
-            action="tx"
-            target={`/track/${slug}/txdata?trackId=${track!.id}`}
-          >
-            Collect
-          </FrameButton>
+          {isCollectable && (
+            <FrameButton
+              action="tx"
+              target={`/track/${slug}/txdata?trackId=${track!.id}`}
+            >
+              Collect
+            </FrameButton>
+          )}
           <FrameButton
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
@@ -202,12 +213,14 @@ export default async function Track({
           >
             Download
           </FrameButton>
-          <FrameButton
-            action="tx"
-            target={`/track/${slug}/txdata?trackId=${track!.id}`}
-          >
-            Collect
-          </FrameButton>
+          {isCollectable && (
+            <FrameButton
+              action="tx"
+              target={`/track/${slug}/txdata?trackId=${track!.id}`}
+            >
+              Collect
+            </FrameButton>
+          )}
         </FrameContainer>
       );
     }

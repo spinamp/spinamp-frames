@@ -69,10 +69,12 @@ export async function sendNotification(payload: {
     body: JSON.stringify(body),
   };
 
-  return fetch(process.env.SPINAMP_NOTIFICATIONS_ENDPOINT!, options)
-    // .then((response) => response.json())
-    // .then((response) => console.log(response))
-    .catch((err) => console.error(err));
+  return (
+    fetch(process.env.SPINAMP_NOTIFICATIONS_ENDPOINT!, options)
+      // .then((response) => response.json())
+      // .then((response) => console.log(response))
+      .catch((err) => console.error(err))
+  );
 }
 
 async function signMessage(message: string) {
@@ -115,4 +117,39 @@ export async function getSpinampUserId(
 
   // TODO: what should we do if there is more than one spindexer user??
   return nodes.map((node: any) => node.userId).at(0);
+}
+
+export async function getMintDetails(trackId: string, userAddress: string) {
+  const mintResponse = await fetch(
+    `https://api.spinamp.xyz/v3/mint?userAddress=${userAddress}&quantity=1&processedTrackId=${trackId}`
+  );
+
+  const mintData = await mintResponse.json();
+
+  const cheapestMint = mintData.sort((a: any, b: any) => {
+    const diff = BigInt(a.price.value) - BigInt(b.price.value);
+    console.log("a", a.price.value, "b", b.price.value, "diff", diff);
+    return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+  })[0];
+
+  console.log("got mint response", mintData);
+  console.log("cheapestMint", cheapestMint);
+
+  const supportedChains = [10, 8453, 7777777];
+
+  if (
+    cheapestMint.available &&
+    supportedChains.includes(cheapestMint.mintTransaction.chainId)
+  ) {
+    return cheapestMint;
+  }
+}
+
+export async function isTrackCollectable(trackId: string) {
+  const mintResult = await getMintDetails(
+    trackId,
+    "0xeF42cF85bE6aDf3081aDA73aF87e27996046fE63" // hardcode musnit.eth
+  );
+
+  return mintResult !== undefined;
 }

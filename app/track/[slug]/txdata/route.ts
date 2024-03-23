@@ -1,6 +1,7 @@
 import { TransactionTargetResponse } from "frames.js";
 import { getFrameMessage } from "frames.js/next/server";
 import { NextRequest, NextResponse } from "next/server";
+import { getMintDetails } from "../../../utils";
 
 export async function POST(
   req: NextRequest
@@ -22,20 +23,8 @@ export async function POST(
     throw new Error("No wallet connected!");
   }
   // fetch data from mint API
-  const mintResponse = await fetch(
-    `https://api.spinamp.xyz/v3/mint?userAddress=${userAddress}&quantity=1&processedTrackId=${trackId}`
-  );
+  const cheapestMint = await getMintDetails(trackId!, userAddress);
 
-  const mintData = await mintResponse.json();
-
-  const cheapestMint = mintData.sort((a: any, b: any) => {
-    const diff = BigInt(a.price.value) - BigInt(b.price.value);
-    console.log("a", a.price.value, "b", b.price.value, "diff", diff);
-    return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-  })[0];
-
-  console.log("got mint response", mintData);
-  console.log("cheapestMint", cheapestMint);
   // TODO: maybe should be able to browse different tiers if there are multiple and pick one?
 
   if (!cheapestMint.available) {
