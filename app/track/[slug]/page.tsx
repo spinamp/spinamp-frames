@@ -102,7 +102,6 @@ export default async function Track({
   if (!slug) {
     throw new Error("invalid payload: no slug");
   }
-  const url = currentURL("/examples/mint-button");
   const previousFrame = getPreviousFrame<State>(searchParams);
   const [state] = useFramesReducer<State>(reducer, initialState, previousFrame);
 
@@ -176,7 +175,6 @@ export default async function Track({
     // then, when done, return next frame
     return (
       <div>
-        Mint button example <Link href={createDebugUrl(url)}>Debug</Link>
         <FrameContainer
           pathname={`/track/${slug}`}
           postUrl={`/track/${slug}/frames`}
@@ -235,9 +233,12 @@ export default async function Track({
           >
             Download
           </FrameButton>
-          {/* <FrameButton action="post_redirect" target={`/track/${slug}`}>
+          <FrameButton
+            action="post"
+            target={`/track/${slug}/home?slug=${slug}`}
+          >
             Back
-          </FrameButton> */}
+          </FrameButton>
         </FrameContainer>
       );
     }
@@ -250,7 +251,6 @@ export default async function Track({
     // then, when done, return next frame
     return (
       <div>
-        Mint button example <Link href={createDebugUrl(url)}>Debug</Link>
         <FrameContainer
           pathname={`/track/${slug}`}
           postUrl={`/track/${slug}/frames`}
