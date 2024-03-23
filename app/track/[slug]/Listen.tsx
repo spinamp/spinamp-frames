@@ -52,7 +52,7 @@ export const Listen = async ({
       })}
       <FrameButton
         action="link"
-        target={`https://app.spinamp.xyz/track/${slug}`}
+        target={`https://app.spinamp.xyz/track/${track.slug}`}
       >
         Open on Spinamp
       </FrameButton>
