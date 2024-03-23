@@ -134,21 +134,33 @@ export async function getMintDetails(trackId: string, userAddress: string) {
   console.log("got mint response", mintData);
   console.log("cheapestMint", cheapestMint);
 
-  const supportedChains = [10, 8453, 7777777];
-
-  if (
-    cheapestMint.available &&
-    supportedChains.includes(cheapestMint.mintTransaction.chainId)
-  ) {
+  if (cheapestMint.available) {
     return cheapestMint;
   }
 }
 
-export async function isTrackCollectable(trackId: string) {
+export const SUPPORTED_CHAINS = [10, 8453, 7777777];
+
+export async function isTrackCollectable(trackId: string): Promise<{
+  isCollectable: boolean;
+  chainSupported: boolean;
+}> {
   const mintResult = await getMintDetails(
     trackId,
     "0xeF42cF85bE6aDf3081aDA73aF87e27996046fE63" // hardcode musnit.eth
   );
 
-  return mintResult !== undefined;
+  if (!mintResult) {
+    return {
+      isCollectable: false,
+      chainSupported: false,
+    };
+  }
+
+  return {
+    isCollectable: mintResult.available,
+    chainSupported: SUPPORTED_CHAINS.includes(
+      mintResult.mintTransaction.chainId
+    ),
+  };
 }

@@ -7,6 +7,7 @@ import {
 } from "frames.js/next/server";
 import { TrackFrameState } from "./page";
 import { CollectButton } from "./CollectButton";
+import { isTrackCollectable } from "../../utils";
 
 type HomeProps = {
   slug: string;
@@ -14,19 +15,19 @@ type HomeProps = {
   previousFrame: PreviousFrame<TrackFrameState>;
   acceptedProtocols: ClientProtocolId[];
   artworkURL: string;
-  isCollectable: boolean;
   trackId: string;
 };
 
-export function Home({
+export async function Home({
   slug,
   state,
   previousFrame,
   acceptedProtocols,
   artworkURL,
-  isCollectable,
   trackId,
 }: HomeProps) {
+  const { isCollectable, chainSupported } = await isTrackCollectable(trackId);
+
   return (
     <FrameContainer
       pathname={`/track/${slug}`}
@@ -37,7 +38,10 @@ export function Home({
     >
       <FrameImage src={artworkURL} aspectRatio="1:1" />
       <FrameButton>Play 🎧</FrameButton>
-      {CollectButton(isCollectable, slug, trackId)}
+      {/* only show the collect button here if the track is collectable */}
+      {chainSupported
+        ? CollectButton({ isCollectable, slug, trackId, chainSupported })
+        : null}
       <FrameButton
         action="link"
         target={`https://app.spinamp.xyz/track/${slug}`}

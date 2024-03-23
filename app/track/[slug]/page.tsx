@@ -48,7 +48,7 @@ export type TrackFrameState = {
   currentPage: Page;
 };
 
-const initialState = { currentPage: Page.MINTED };
+const initialState = { currentPage: Page.HOME };
 
 const reducer: FrameReducer<TrackFrameState> = (state, action) => {
   if (action.postBody?.trustedData) {
@@ -148,9 +148,6 @@ export default async function Track({
     // console.log("got spindexer user id", spindexerUserId);
   }
 
-  const isCollectable = await isTrackCollectable(track!.id);
-  console.log("is colletable", isCollectable);
-
   const safeTitle = track!.title.replace(/[,%/]/g, "");
   const safeArtistName = track!.artist.name.replace(/[,%/]/g, "");
   const artworkURL = makeTrackFrameImageURL(
@@ -164,7 +161,6 @@ export default async function Track({
       <Home
         acceptedProtocols={acceptedProtocols}
         artworkURL={artworkURL}
-        isCollectable={isCollectable}
         previousFrame={previousFrame}
         slug={slug}
         state={state}
@@ -191,7 +187,6 @@ export default async function Track({
         <Listen
           acceptedProtocols={acceptedProtocols}
           artworkURL={artworkURL}
-          isCollectable={isCollectable}
           previousFrame={previousFrame}
           slug={slug}
           state={state}
@@ -204,7 +199,6 @@ export default async function Track({
         <Onboarding
           acceptedProtocols={acceptedProtocols}
           artworkURL={artworkURL}
-          isCollectable={isCollectable}
           previousFrame={previousFrame}
           slug={slug}
           state={state}
@@ -219,7 +213,6 @@ export default async function Track({
       <Minted
         acceptedProtocols={acceptedProtocols}
         artworkURL={artworkURL}
-        isCollectable={isCollectable}
         previousFrame={previousFrame}
         state={state}
         track={track!}
@@ -232,7 +225,6 @@ export default async function Track({
       <Done
         acceptedProtocols={acceptedProtocols}
         artworkURL={artworkURL}
-        isCollectable={isCollectable}
         previousFrame={previousFrame}
         state={state}
         track={track!}

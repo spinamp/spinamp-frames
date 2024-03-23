@@ -1,12 +1,31 @@
 import { FrameButton } from "frames.js/next/server";
 
-export const CollectButton = (
-  isCollectable: boolean,
-  slug: string,
-  trackId: string
-) => {
+type Props = {
+  isCollectable: boolean;
+  chainSupported: boolean;
+  slug: string;
+  trackId: string;
+};
+
+export const CollectButton = ({
+  isCollectable,
+  chainSupported,
+  slug,
+  trackId,
+}: Props) => {
   if (!isCollectable) {
     return null;
+  }
+
+  if (!chainSupported) {
+    return (
+      <FrameButton
+        action="link"
+        target={`https://app.spinamp.xyz/track/${slug}`}
+      >
+        Collect
+      </FrameButton>
+    );
   }
 
   return (

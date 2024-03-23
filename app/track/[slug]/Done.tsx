@@ -13,7 +13,6 @@ type Props = {
   previousFrame: PreviousFrame<TrackFrameState>;
   acceptedProtocols: ClientProtocolId[];
   artworkURL: string;
-  isCollectable: boolean;
   track: ITrack;
 };
 
