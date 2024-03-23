@@ -133,7 +133,7 @@ export default async function Track({
           previousFrame={previousFrame}
         >
           <FrameImage src={artworkURL} aspectRatio="1:1" />
-          <FrameButton>Listen</FrameButton>
+          <FrameButton>Play 🎧</FrameButton>
           <FrameButton
             action="tx"
             target={`/track/${slug}/txdata?trackId=${track!.id}`}
@@ -144,7 +144,7 @@ export default async function Track({
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
           >
-            Open on Spinamp
+            Details
           </FrameButton>
         </FrameContainer>
       </div>
@@ -182,12 +182,6 @@ export default async function Track({
           target={`https://apps.apple.com/app/spinamp/id1613783898`}
         >
           Download
-      </FrameButton>
-      <FrameButton
-          action="link"
-          target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
-        >
-          Open on Spinamp
       </FrameButton>
       <FrameButton
             action="tx"
@@ -270,7 +264,7 @@ export default async function Track({
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
           >
-            Open on Spinamp
+            Details
           </FrameButton>
         </FrameContainer>
       </div>
