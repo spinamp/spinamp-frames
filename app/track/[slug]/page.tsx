@@ -1,23 +1,17 @@
 import { fetchTrackBySlug, getResizedArtworkUrl } from "@spinamp/spinamp-sdk";
 import {
-  FrameButton,
-  FrameContainer,
-  FrameImage,
   FrameReducer,
   NextServerPageProps,
   getFrameMessage,
   getPreviousFrame,
   useFramesReducer,
 } from "frames.js/next/server";
-import Link from "next/link";
 import {
-  currentURL,
   getSpinampUserIds,
   isTrackCollectable,
   sendNotification,
   sendPinataAnalytics,
 } from "../../utils";
-import { createDebugUrl, DEFAULT_DEBUGGER_HUB_URL } from "../../debug";
 import { getAddress } from "ethers/lib/utils";
 import { getXmtpFrameMessage, isXmtpFrameActionPayload } from "frames.js/xmtp";
 
@@ -26,6 +20,11 @@ import {
   makeTrackFrameImageURL,
 } from "../../helpers/image-gen";
 import { ClientProtocolId } from "frames.js";
+import { Home } from "./Home";
+import { Onboarding } from "./Onboarding";
+import { Listen } from "./Listen";
+import { Minted } from "./Minted";
+import { Done } from "./Done";
 
 const acceptedProtocols: ClientProtocolId[] = [
   {
@@ -45,13 +44,13 @@ enum Page {
   DONE,
 }
 
-type State = {
+export type TrackFrameState = {
   currentPage: Page;
 };
 
-const initialState = { currentPage: Page.HOME };
+const initialState = { currentPage: Page.MINTED };
 
-const reducer: FrameReducer<State> = (state, action) => {
+const reducer: FrameReducer<TrackFrameState> = (state, action) => {
   if (action.postBody?.trustedData) {
     sendPinataAnalytics({
       custom_id: action.postBody.untrustedData.url.split("/").at(-1) ?? "track",
@@ -102,8 +101,12 @@ export default async function Track({
   if (!slug) {
     throw new Error("invalid payload: no slug");
   }
-  const previousFrame = getPreviousFrame<State>(searchParams);
-  const [state] = useFramesReducer<State>(reducer, initialState, previousFrame);
+  const previousFrame = getPreviousFrame<TrackFrameState>(searchParams);
+  const [state] = useFramesReducer<TrackFrameState>(
+    reducer,
+    initialState,
+    previousFrame
+  );
 
   let frameMessage;
   // if (
@@ -156,43 +159,17 @@ export default async function Track({
     safeArtistName
   );
 
-  const CollectButton = () => {
-    if (!isCollectable) {
-      return null;
-    }
-
-    return (
-      <FrameButton
-        action="tx"
-        target={`/track/${slug}/txdata?trackId=${track!.id}`}
-      >
-        Collect
-      </FrameButton>
-    );
-  };
-
   if (state.currentPage === Page.HOME) {
-    // then, when done, return next frame
     return (
-      <div>
-        <FrameContainer
-          pathname={`/track/${slug}`}
-          postUrl={`/track/${slug}/frames`}
-          state={state}
-          previousFrame={previousFrame}
-          accepts={acceptedProtocols}
-        >
-          <FrameImage src={artworkURL} aspectRatio="1:1" />
-          <FrameButton>Play 🎧</FrameButton>
-          {CollectButton()}
-          <FrameButton
-            action="link"
-            target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
-          >
-            More
-          </FrameButton>
-        </FrameContainer>
-      </div>
+      <Home
+        acceptedProtocols={acceptedProtocols}
+        artworkURL={artworkURL}
+        isCollectable={isCollectable}
+        previousFrame={previousFrame}
+        slug={slug}
+        state={state}
+        trackId={track!.id}
+      />
     );
   }
 
@@ -205,132 +182,61 @@ export default async function Track({
         trackTitle: track!.title,
         trackUrl: `https://app.spinamp.xyz/track/${(params as any).slug}`,
       });
+      const listenImageUrl = makeListenFrameImageURL(
+        track!.lossyArtworkIPFSHash!,
+        safeTitle,
+        safeArtistName
+      );
+      return (
+        <Listen
+          acceptedProtocols={acceptedProtocols}
+          artworkURL={artworkURL}
+          isCollectable={isCollectable}
+          previousFrame={previousFrame}
+          slug={slug}
+          state={state}
+          trackId={track!.id}
+          imageUrl={listenImageUrl}
+        />
+      );
     } else {
       return (
-        <FrameContainer
-          pathname={`/track/${slug}`}
-          postUrl={`/track/${slug}/frames`}
-          state={state}
+        <Onboarding
+          acceptedProtocols={acceptedProtocols}
+          artworkURL={artworkURL}
+          isCollectable={isCollectable}
           previousFrame={previousFrame}
-          accepts={acceptedProtocols}
-        >
-          <FrameImage
-            src="https://spinamp.mypinata.cloud/ipfs/Qmf9qgVShudRcyDLY8esEH9iUS6yX7wms5NcpkeRyoyzCW"
-            aspectRatio="1:1"
-          >
-            {/* <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
-              <div tw="flex flex-row">It looks like Farcaster account is not associated with any Spinamp account</div>
-              <div>Spinamp is a music app filled with tons of amazing onchain music and artists to discover</div>
-              <div>Download Spinamp to play music without leaving the frame!:</div>
-              <div tw="flex flex-row">- Download Spinamp</div>
-              <div tw="flex flex-row">- Sign up using any wallet you&apos;ve verified on Farcaster</div>
-              <div tw="flex flex-row">- Enable notifications and then try again!</div>
-            </div> */}
-          </FrameImage>
-          <FrameButton
-            action="link"
-            target={`https://apps.apple.com/app/spinamp/id1613783898`}
-          >
-            Download
-          </FrameButton>
-          <FrameButton
-            action="post"
-            target={`/track/${slug}/home?slug=${slug}`}
-          >
-            Back
-          </FrameButton>
-        </FrameContainer>
+          slug={slug}
+          state={state}
+          trackId={track!.id}
+        />
       );
     }
-
-    const listenImageUrl = makeListenFrameImageURL(
-      track!.lossyArtworkIPFSHash!,
-      safeTitle,
-      safeArtistName
-    );
-    // then, when done, return next frame
-    return (
-      <div>
-        <FrameContainer
-          pathname={`/track/${slug}`}
-          postUrl={`/track/${slug}/frames`}
-          state={state}
-          previousFrame={previousFrame}
-          accepts={acceptedProtocols}
-        >
-          <FrameImage src={listenImageUrl} aspectRatio="1:1" />
-          {CollectButton()}
-          {/* <FrameButton
-            action="link"
-            target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
-          >
-            Open on Spinamp
-          </FrameButton> */}
-        </FrameContainer>
-      </div>
-    );
   }
 
   if (state.currentPage === Page.MINTED) {
-    // then, when done, return next frame
     return (
-      <div>
-        <FrameContainer
-          pathname={`/track/${slug}`}
-          postUrl={`/track/${slug}/frames`}
-          state={state}
-          previousFrame={previousFrame}
-          accepts={acceptedProtocols}
-        >
-          <FrameImage
-            aspectRatio="1:1"
-            // src={makeCollectedFrameImageURL(safeTitle, safeArtistName)}
-          >
-            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center p-10 flex flex-col space-y-4">
-              <div tw="flex flex-row justify-center mb-10">
-                <img
-                  src="https://spinamp.mypinata.cloud/ipfs/QmV4248XpCLqDS2tvGMwaDJsUgYif8LgUqgyPFfw6aL4jm"
-                  width={200}
-                  height={200}
-                />
-              </div>
-              <div tw="flex flex-row space-x-4 text-center text-7xl font-black mb-10">
-                Congratulations!
-              </div>
-              <div tw="flex flex-row space-y-4 text-center">{`You are the owner of ${safeTitle} by ${safeArtistName}. Let's celebrate!`}</div>
-            </div>
-          </FrameImage>
-          <FrameButton>{`Follow ${safeArtistName}`}</FrameButton>
-          <FrameButton>Like</FrameButton>
-        </FrameContainer>
-      </div>
+      <Minted
+        acceptedProtocols={acceptedProtocols}
+        artworkURL={artworkURL}
+        isCollectable={isCollectable}
+        previousFrame={previousFrame}
+        state={state}
+        track={track!}
+      />
     );
   }
 
   if (state.currentPage === Page.DONE) {
     return (
-      <div>
-        <FrameContainer
-          pathname={`/track/${slug}`}
-          postUrl={`/track/${slug}/frames`}
-          state={state}
-          previousFrame={previousFrame}
-          accepts={acceptedProtocols}
-        >
-          <FrameImage aspectRatio="1:1">
-            <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center flex flex-col space-y-4">
-              <div tw="flex flex-row">Coming soon!</div>
-              <div tw="flex flex-row">open spinamp to discover more</div>
-            </div>
-          </FrameImage>
-          <FrameButton
-            action="link"
-            target={`https://app.spinamp.xyz/track/${slug}`}
-          >
-            like & follow
-          </FrameButton>
-        </FrameContainer>
-      </div>
+      <Done
+        acceptedProtocols={acceptedProtocols}
+        artworkURL={artworkURL}
+        isCollectable={isCollectable}
+        previousFrame={previousFrame}
+        state={state}
+        track={track!}
+      />
     );
   }
 }
