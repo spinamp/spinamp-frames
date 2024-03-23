@@ -144,7 +144,7 @@ export default async function Track({
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug}`}
           >
-            Details
+            More
           </FrameButton>
         </FrameContainer>
       </div>
@@ -264,7 +264,7 @@ export default async function Track({
             action="link"
             target={`https://app.spinamp.xyz/track/${(params as any).slug!}`}
           >
-            Details
+            More
           </FrameButton>
         </FrameContainer>
       </div>
