@@ -18,6 +18,7 @@ import { Onboarding } from "./Onboarding";
 import { Listen } from "./Listen";
 import { Minted } from "./Minted";
 import { Done } from "./Done";
+import { getXmtpFrameMessage, isXmtpFrameActionPayload } from "frames.js/xmtp";
 
 const acceptedProtocols: ClientProtocolId[] = [
   {
@@ -87,9 +88,6 @@ export default async function Track({
   searchParams,
   params,
 }: NextServerPageProps) {
-  const startTime = performance.now();
-  console.log("Time started");
-
   const slug = (params as any).slug;
   if (!slug) {
     throw new Error("invalid payload: no slug");
@@ -101,21 +99,31 @@ export default async function Track({
     previousFrame
   );
 
-  console.log("previous frame", previousFrame);
+  let walletAddresses: string[] = [];
 
-  const frameMessage = await getFrameMessage(previousFrame.postBody);
-
-  async function fetchUserIds() {
+  if (
+    previousFrame.postBody &&
+    isXmtpFrameActionPayload(previousFrame.postBody)
+  ) {
+    const frameMessage = await getXmtpFrameMessage(previousFrame.postBody);
+    walletAddresses.push(frameMessage?.verifiedWalletAddress);
+  } else {
+    const frameMessage = await getFrameMessage(previousFrame.postBody);
     if (frameMessage) {
-      const addresses = [frameMessage.requesterCustodyAddress];
+      walletAddresses.push(frameMessage.requesterCustodyAddress);
       if (frameMessage.connectedAddress) {
-        addresses.push(frameMessage.connectedAddress);
+        walletAddresses.push(frameMessage.connectedAddress);
       }
       if (frameMessage.requesterVerifiedAddresses.length > 0) {
-        addresses.push(...frameMessage.requesterVerifiedAddresses);
+        walletAddresses.push(...frameMessage.requesterVerifiedAddresses);
       }
+    }
+  }
+
+  async function fetchUserIds() {
+    if (walletAddresses.length > 0) {
       const ids = getSpinampUserIds(
-        addresses.map((address) => getAddress(address))
+        walletAddresses.map((address) => getAddress(address))
       );
       return ids;
     }
