@@ -70,8 +70,8 @@ export async function sendNotification(payload: {
   };
 
   return fetch(process.env.SPINAMP_NOTIFICATIONS_ENDPOINT!, options)
-    .then((response) => response.json())
-    .then((response) => console.log(response))
+    // .then((response) => response.json())
+    // .then((response) => console.log(response))
     .catch((err) => console.error(err));
 }
 
