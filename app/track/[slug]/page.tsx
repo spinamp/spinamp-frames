@@ -84,7 +84,9 @@ export default async function Track({
   params,
   ...rest
 }: NextServerPageProps) {
-  console.log("got rest", rest);
+  const startTime = Date.now();
+  console.log("Time started");
+
   const slug = (params as any).slug;
   if (!slug) {
     throw new Error("invalid payload: no slug");
@@ -95,9 +97,14 @@ export default async function Track({
   const frameMessage = await getFrameMessage(previousFrame.postBody, {
     hubHttpUrl: DEFAULT_DEBUGGER_HUB_URL,
   });
-  console.log("got frame message", frameMessage);
+  const messageTime = Date.now();
+  console.log("Time until got frame message", messageTime - startTime);
+  // console.log("got frame message", frameMessage);
 
   const track = await fetchTrackBySlug(slug);
+  const trackSlugTime = Date.now();
+  console.log("Time until got track slug", trackSlugTime - startTime);
+
   let spindexerUserId;
   if (!spindexerUserId && frameMessage) {
     // find spinamp user based on connected address, verified addresses and custody address
@@ -114,7 +121,11 @@ export default async function Track({
     spindexerUserId = await getSpinampUserId(
       addresses.map((address) => getAddress(address))
     );
-    console.log("got spindexer user id", spindexerUserId);
+
+    const userIdTime = Date.now();
+    console.log("Time until got user id", userIdTime - startTime);
+
+    // console.log("got spindexer user id", spindexerUserId);
   }
 
   const safeTitle = track!.title.replace(/[,%/]/g, "");
@@ -153,7 +164,7 @@ export default async function Track({
 
   if (state.currentPage === Page.LISTEN) {
     if (spindexerUserId) {
-      await sendNotification({
+      sendNotification({
         spindexerUserId,
         artistName: track!.artist.name,
         trackId: track!.id,
@@ -202,18 +213,7 @@ export default async function Track({
           state={state}
           previousFrame={previousFrame}
         >
-          <FrameImage aspectRatio="1:1">
-            <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
-              <div tw="flex flex-row">long press notification to listen</div>
-              <img
-                width={200}
-                src={getResizedArtworkUrl(track!.lossyArtworkUrl!, 200)}
-                alt="frame image"
-              />
-              <div tw="flex flex-row">{track?.title}</div>
-              <div tw="flex flex-row">{track?.artist.name}</div>
-            </div>
-          </FrameImage>
+          <FrameImage src={artworkURL}  aspectRatio="1:1" />
           <FrameButton
             action="tx"
             target={`/track/${slug}/txdata?trackId=${track!.id}`}
