@@ -56,7 +56,12 @@ export async function Home({
             trackId: track.id,
             chainSupported,
           })
-        : null}
+        : <FrameButton
+        action="link"
+        target={`https://app.spinamp.xyz/track/${track.slug}`}
+      >
+        Collect
+      </FrameButton>}
       <FrameButton
         action="link"
         target={`https://app.spinamp.xyz/track/${track.slug}`}

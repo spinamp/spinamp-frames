@@ -119,7 +119,9 @@ export async function getMintDetails(trackId: string, userAddress: string) {
 
   const mintData = await mintResponse.json();
 
-  const cheapestMint = mintData.sort((a: any, b: any) => {
+  const pricedMints = mintData.filter((mint: any) => mint.price);
+
+  const cheapestMint = pricedMints.sort((a: any, b: any) => {
     const diff = BigInt(a.price.value) - BigInt(b.price.value);
     return diff < 0 ? -1 : diff > 0 ? 1 : 0;
   })[0];
@@ -136,28 +138,39 @@ export async function isTrackCollectable(trackId: string): Promise<{
   chainSupported: boolean;
   mintResult: any;
 }> {
-  const mintResult = await getMintDetails(
-    trackId,
-    "0xeF42cF85bE6aDf3081aDA73aF87e27996046fE63" // hardcode musnit.eth
-  );
+  try {
 
-  if (!mintResult) {
+    const mintResult = await getMintDetails(
+      trackId,
+      "0xeF42cF85bE6aDf3081aDA73aF87e27996046fE63" // hardcoded to musnit.eth for simulating
+    );
+
+    if (!mintResult) {
+      return {
+        isCollectable: false,
+        chainSupported: false,
+        mintResult,
+      };
+    }
+
+    return {
+      isCollectable: mintResult.available,
+      chainSupported: SUPPORTED_CHAINS.includes(
+        mintResult.mintTransaction.chainId
+      ),
+      mintResult,
+    };
+  } catch (e) {
     return {
       isCollectable: false,
       chainSupported: false,
-      mintResult,
+      mintResult: null,
     };
+
   }
 
-  return {
-    isCollectable: mintResult.available,
-    chainSupported: SUPPORTED_CHAINS.includes(
-      mintResult.mintTransaction.chainId
-    ),
-    mintResult,
-  };
 }
 
 export function safeString(string: string) {
-  return string.replace(/[,%/]/g, "");
+  return string.replace(/[,"?#%/]/g, "");
 }

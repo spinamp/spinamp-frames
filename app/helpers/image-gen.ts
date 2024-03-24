@@ -13,7 +13,7 @@ export const makeTrackFrameImageURL = (
         mintResult.price.value,
         Number.parseInt(mintResult.price.asset.decimals)
       )} ${mintResult.price.asset.symbol}`
-      : "SOLD OUT";
+      : 'NOT COLLECTABLE or SOLD OUT - Try on Spinamp';
   const price = `/co_rgb:e0a307,l_text:poppins_16_regular_left:${priceString}/fl_layer_apply,g_west,x_110,y_285`;
 
   return (
