@@ -24,7 +24,7 @@ export const Listen = async ({
   previousFrame,
   track,
 }: Props) => {
-  const { isCollectable, chainSupported } = await isTrackCollectable(track.id);
+  const { isCollectable, chainSupported, mintResult } = await isTrackCollectable(track.id);
 
   const safeTitle = safeString(track!.title);
   const safeArtistName = safeString(track!.artist.name);
@@ -32,7 +32,9 @@ export const Listen = async ({
   const listenImageUrl = makeListenFrameImageURL(
     track!.lossyArtworkIPFSHash!,
     safeTitle,
-    safeArtistName
+    safeArtistName,
+    isCollectable,
+    mintResult
   );
 
   return (

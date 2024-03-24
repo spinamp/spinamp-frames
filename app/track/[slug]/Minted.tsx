@@ -44,7 +44,9 @@ export const Minted = ({
           <div tw="flex flex-row space-x-4 text-center text-7xl font-black mb-10">
             Congratulations!
           </div>
-          <div tw="flex flex-row space-y-4 text-center">{`You are the owner of ${safeTitle} by ${safeArtistName}. Let's celebrate!`}</div>
+          <div tw="flex flex-row space-y-4 text-center">{`You are the owner of ${safeTitle} by ${safeArtistName}. `}</div>
+          <div tw="mt-10"></div>
+          <div tw="flex flex-row space-y-4 text-center">{`Share this frame and grow the crowd!`}</div>
         </div>
       </FrameImage>
       <FrameButton>{`Follow ${safeArtistName}`}</FrameButton>

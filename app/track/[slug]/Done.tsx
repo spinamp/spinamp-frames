@@ -29,17 +29,13 @@ export const Done = ({
       previousFrame={previousFrame}
       accepts={acceptedProtocols}
     >
-      <FrameImage aspectRatio="1:1">
-        <div tw="w-full h-full bg-[rgb(230,214,196)] text-[rgb(31,74,79)] text-5xl justify-center items-center flex flex-col space-y-4">
-          <div tw="flex flex-row">Coming soon!</div>
-          <div tw="flex flex-row">open spinamp to discover more</div>
-        </div>
+      <FrameImage src="https://content.spinamp.xyz/image/upload/v1711246194/kgtiqon6o93gyvhvnkmj.png" aspectRatio="1:1">
       </FrameImage>
       <FrameButton
         action="link"
         target={`https://app.spinamp.xyz/track/${track.slug}`}
       >
-        like & follow
+        Like & Follow
       </FrameButton>
     </FrameContainer>
   );
