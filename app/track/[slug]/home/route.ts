@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const queryParams = new URL(req.url).searchParams;
-  const slug = queryParams.get("slug");
+  const reqUrl = new URL(req.url);
+  const slug = reqUrl.pathname.split("/")[2];
 
-  const url = new URL(req.url);
-
-  return NextResponse.redirect(`${url.origin}/track/${slug}`);
+  return NextResponse.redirect(`${reqUrl.origin}/track/${slug}`);
 }
