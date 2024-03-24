@@ -30,7 +30,7 @@ export const Onboarding = ({
       accepts={acceptedProtocols}
     >
       <FrameImage
-        src="https://content.spinamp.xyz/image/upload/f_jpg/cuig7ayko1heptz2a8qw"
+        src="https://content.spinamp.xyz/image/upload/v1711261767/i64q3owzwpch54knpb4m.gif"
         aspectRatio="1:1"
       >
         {/* <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
