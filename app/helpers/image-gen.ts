@@ -47,7 +47,7 @@ export const makeListenFrameImageURL = (
 
   return (
     `https://content.spinamp.xyz/spinamp-prod/image/upload/c_fill,h_510,w_600` +
-    `/l_brksfoomaqdoxci7lasz/c_scale,h_78,w_361/fl_layer_apply,g_north,y_50` + // delivered bubble
+    `/l_houhhgqfqc30he5fea47.svg/c_scale,h_78,w_361/fl_layer_apply,g_north,y_50` + // delivered bubble
     `/l_icj2i9l7buaqgysbkjov/c_scale,h_90,w_600/fl_layer_apply,g_north,y_510` + // bottom bar
     `/l_ynn1e8xpat6csimlnt1a.svg/c_scale,h_40,w_40/fl_layer_apply,g_west,x_545,y_273` + // spinamp logo
     `/l_d45btlryyp0dxtsmyezr.svg/c_scale,h_70,w_50/fl_layer_apply,g_north,x_-240,y_530` + // collect icon

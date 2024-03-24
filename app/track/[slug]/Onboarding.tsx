@@ -30,7 +30,7 @@ export const Onboarding = ({
       accepts={acceptedProtocols}
     >
       <FrameImage
-        src="https://spinamp.mypinata.cloud/ipfs/Qmf9qgVShudRcyDLY8esEH9iUS6yX7wms5NcpkeRyoyzCW"
+        src="https://content.spinamp.xyz/image/upload/f_jpg/cuig7ayko1heptz2a8qw"
         aspectRatio="1:1"
       >
         {/* <div tw="w-full h-full bg-slate-700 text-white justify-center items-center flex flex-col">
