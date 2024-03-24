@@ -109,7 +109,7 @@ export async function getSpinampUserIds(
     return [];
   }
 
-  return nodes.map((node: any) => node.userId);
+  return nodes.filter((node: any) => node).map((node: any) => node.userId);
 }
 
 export async function getMintDetails(trackId: string, userAddress: string) {
