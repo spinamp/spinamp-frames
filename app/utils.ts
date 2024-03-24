@@ -172,5 +172,5 @@ export async function isTrackCollectable(trackId: string): Promise<{
 }
 
 export function safeString(string: string) {
-  return string.replace(/[,"?#%/]/g, "");
+  return string.replace(/[,"?#%/]/g, "").slice(0, 45);
 }
